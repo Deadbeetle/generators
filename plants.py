@@ -50,15 +50,15 @@ tables = {
     },
     
     "flavor": {
-        1: "It only blooms once every ${number:10} years",
-        2: "Its ${parts} turn ${colors} when the soil has ${soil_properties}",
-        3: "The ${parts} can be ${usages}",
-        4: "The ${parts} are ${textures} and taste ${tastes} when ${preparations}",
-        5: "A certain pathogen will cause the ${parts} to ${minor_symptoms} before eventually ${major_symptoms}",
-        6: "The ${parts} are edible and high in ${nutrients}",
-        7: "The ${parts} are edible, but nutritionally poor",
-        8: "The ${parts} smell ${smells}",
-        9: "It blooms in ${seasons}"
+        1: "1It only blooms once every ${number:10} years",
+        2: "0Its ${parts} turn ${colors} when the soil has ${soil_properties}",
+        3: "0The ${parts} can be ${usages}",
+        4: "0The ${parts} are ${textures} and taste ${tastes} when ${preparations}",
+        5: "0A certain pathogen will cause the ${parts} to ${minor_symptoms} before eventually ${major_symptoms}",
+        6: "0The ${parts} are edible and high in ${nutrients}",
+        7: "0The ${parts} are edible, but nutritionally poor",
+        8: "0The ${parts} smell ${smells}",
+        9: "2It blooms in ${seasons}"
     },
     
     "minor_symptoms": {
@@ -128,23 +128,31 @@ tables = {
         2: "applied topically to ${effects}",
         3: "eaten to ${effects}",
         4: "burned and the smoke inhaled to ${effects}",
-        5: "injected to ${effects}"
+        5: "distilled and injected to ${effects}"
     },
     
     **common.tables
 }
+
+
 
 class Plant:
     def __init__(self):
         self.size = random()*randint(1,10)*randint(1,10)
         self.appearance = common.populate_flavor("A ${sizes:%.2f} (%.2f ft), ${descriptors} plant with ${colors} ${parts} and ${colors} ${parts}" % (self.size, self.size), tables)
         self.flavor = list()
+        temp = ''
+        hold = ''
+        track = 0
         for i in range(randint(1,10)+2):
-            flavor = common.populate_flavor("${flavor}", tables)
-            if "blooms" in flavor:
-                if not flavor[:13] in self.flavor:
-                    self.flavor.append(flavor)
-            else:
-                self.flavor.append(flavor)
+            while track != 1:
+                temp = common.populate_flavor("${flavor}", tables)
+                if temp[0] not in hold or temp[0] == '0':
+                    hold = hold + temp[0]
+                    temp = temp[1:]
+                    self.flavor.append(temp)
+                    temp = ''
+                    track = 1
+            track = 0
     def __str__(self):
         return "{}.".format(".\n".join([self.appearance, *self.flavor]))
